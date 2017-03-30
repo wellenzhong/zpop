@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .popup{
+            display: none;
+            width: 0px;
+            height: 0px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            background-color: #000000;
+            border-radius: 5px;
+            opacity: 0;
+            filter: alpha(opacity=0)
+        }
+        .close {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            width:30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            font-size: 25px;
+            color: #FFF;
+            cursor: pointer;
+        }
+        .zpop-body{
+            color: #FFF;
+        }
+    </style>
+</head>
+<body>
+    <button type="button" id="btn">弹窗</button>
+
+    <script>
+        var btn=document.getElementById("btn");
+        var _body=document.getElementsByTagName('body')[0];
+        btn.onclick=function(){
+            var popexist=document.getElementsByClassName('popup');
+            if(popexist.length<=0){
+            zpopshow('<h1 style="color:blue;">大家好！</h1>','大家好')
+            var popup=document.getElementById("popup");
+            var close=document.getElementById('close');
+            popup.style.display="block";
+            var curOpacity=0;
+            popup.style.height='0px';
+            popup.style.width='0px';
+            var timer=setInterval(function(){
+                var speed1=10;
+                var speed2=8;
+                var speed3=2;
+                var tWidth=400;
+                var tHeight=320;
+                var tOpacity=20;
+                var curWidth=popup.currentStyle?popup.currentStyle.width:window.getComputedStyle(popup,null).width;
+                var curHeight=popup.currentStyle?popup.currentStyle.height:window.getComputedStyle(popup,null).height;
+                curWidth=parseInt(curWidth);
+                curHeight=parseInt(curHeight);
+                popup.style.marginLeft=(0-curWidth/2)+"px";
+                popup.style.marginTop=(0-curHeight/2)+"px";
+                if(curWidth<tWidth){
+                    popup.style.width =curWidth+speed1+"px";
+                }else{
+                    clearInterval(timer);
+                }
+                if(curHeight<tHeight){
+                    popup.style.height =curHeight+speed2+"px";
+                }
+                if(curOpacity<tOpacity){
+                    curOpacity +=speed3;
+                    popup.style.opacity=curOpacity/100;
+                    popup.style.filter='alpha(opacity='+curOpacity+')';
+                }
+
+            
+            },5)
+            }else{
+                return false;
+            }
+            close.onclick=function(){
+            var curOpacity=20;
+            var timer=setInterval(function(){
+                console.log("hello")
+                if(curOpacity>0){
+                    curOpacity -=2;
+                    popup.style.opacity=curOpacity/100;
+                    popup.style.filter='alpha(opacity='+curOpacity+')';
+                }else{
+                    _body.removeChild(document.getElementById('popup-wrap'));
+                    clearInterval(timer);
+                }
+            },7)
+        }
+        };
+        
+        function zpopshow(word,newfn){
+            var _html='<div class="popup" id="popup">'+
+                    '        <span class="close" id=\'close\'>&times;</span>'+
+                    '        <div class="zpop-body">'+word+'</div>'+
+                    '        <button type="button">确定</button>'+
+                    '    </div>';
+            var new_html=document.createElement('div');
+            new_html.id="popup-wrap";
+            new_html.innerHTML=_html;
+            _body.appendChild(new_html);
+            alert(newfn);
+
+        }
+    </script>
+</body>
+</html>

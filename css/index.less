@@ -1,0 +1,112 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+     display: table;
+}
+#popup-wrap{
+    width: 100%;
+    height: 100%;
+}
+.zpop-bg {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: .2;
+    filter: alpha(opacity=20)
+}
+
+.my-zpop {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    .zpop-wrap {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 999;
+        min-width: 0px;
+        min-height: 0px;
+        width: 0px;
+        height: 0px;
+        background-color: #fff;
+        border-radius: 5px;
+        overflow: hidden;
+        .zpop-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background-color: #515151;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            .zpop-title {
+                line-height: 40px;
+                color: #FFF;
+                font-size: 14px;
+                padding:0 10px;
+            }
+            .zpop-close-ico{
+                position: absolute;
+                width: 30px;
+                height: 30px;
+                line-height: 30px;
+                right: 10px;
+                top: 5px;
+                color: #FFF;
+                font-size: 30px;
+                text-align: center;
+                cursor: pointer;
+                &:hover{
+                    color: #ddd;
+                }
+            }
+        }
+        .zpop-body{
+            padding: 40px 0 60px 0;
+            .zpop-content{
+                padding: 10px;
+            }
+        }
+        .zpop-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50px;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-top: 1px solid #ddd;
+            // background-color: #eb0000;
+            text-align: center;
+            display: table-cell;
+            vertical-align: middle;
+            padding: 5px 0;
+            button{
+                outline: none;
+                color: #FFF;
+                border: 1px solid #515151;
+                border-radius: 5px;
+                width:80px;
+                height: 30px;
+                line-height: 30px;
+                margin-top: 8px;
+                cursor: pointer;
+                background-color: #515151;
+                &:hover {
+                    background-color: #eb0000;
+                    border: 1px solid #eb0000;
+                }
+                &:first-child{
+                    margin-right: 10px;
+                }
+            }
+        }
+    }
+}
