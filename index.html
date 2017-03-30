@@ -9,16 +9,29 @@
 </head>
 
 <body>
-    <button type="button" id="btn" style="position: absolute;z-index: 9999">弹窗</button>
+    <button type="button" id="btnlight" style="position: relative;z-index: 9999">light</button>
+    <button type="button" id="btnpop" style="position: relative;z-index: 9999">popup</button>
 
     <script src="./bundle.js"></script>
     <script>
-        var btn=document.getElementById("btn");
-        function hello(){
-            alert("hello!")
+        var btnLight=document.getElementById("btnlight");
+        var btnPopup=document.getElementById("btnpop");
+        btnpop.onclick=function(){
+            zpop.confirm({
+                title:"温馨提示",
+                content:"大家好！",
+                yesFn: function () {
+                    zpop.light("您点了确定");
+                    return true;
+                },
+                cancelFn: function () {
+                    zpop.light("您点了取消");
+                    return false;
+                }
+            });
         }
-        btn.onclick=function(){
-            zpop.zpopinit(hello);
+        btnLight.onclick=function () {
+            zpop.light("您点了确定",1000);
         }
     </script>
 </body>

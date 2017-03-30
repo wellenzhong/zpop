@@ -1,14 +1,11 @@
 (function(win) {
     "use strict";
     var zpop = {
-        hello: function() {
-            alert("hello world!")
-        },
         _body: document.getElementsByTagName('body')[0],
-        zpopinit: function(cancelfn) {
-            var popexist = document.getElementsByClassName('my-zpop');
+        confirm: function(obj) {
+            var popexist = document.getElementsByClassName('zpop-wrap');
             if (popexist.length <= 0) {
-                this.zpopshow("温馨提示", '大家好！')
+                this.zpopshow(obj.title, obj.content)
                 var popup = document.getElementById("zpop-wrap");
                 var closeBtn = document.getElementById('zpop-close-ico');
                 var yesBtn = document.getElementById('yes-btn');
@@ -21,8 +18,8 @@
                     var speed1 = 10;
                     var speed2 = 8;
                     var speed3 = 2;
-                    var tWidth = 400;
-                    var tHeight = 320;
+                    var tWidth = obj.width||400;
+                    var tHeight = obj.height||320;
                     var tOpacity = 100;
                     var curWidth = popup.currentStyle ? popup.currentStyle.width : window.getComputedStyle(popup, null).width;
                     var curHeight = popup.currentStyle ? popup.currentStyle.height : window.getComputedStyle(popup, null).height;
@@ -56,13 +53,51 @@
 
             if (cancelBtn) {
                 cancelBtn.onclick=function(){
-                    if(cancelfn&&typeof cancelfn=="function"){
-                        cancelfn();
+                    if(obj.cancelFn&&typeof obj.cancelFn=="function"){
+                        var _res=obj.cancelFn();
+                        if (!_res) {
+                            zpop.closePop();
+                        }
                     }else{
-                        zpop.closePop()
+                        zpop.closePop();
                     }
                 }
             }
+            if (yesBtn) {
+                yesBtn.onclick=function () {
+                    if (obj.yesFn&&typeof obj.yesFn=="function") {
+                        var _res=obj.yesFn();
+                        if (!_res) {
+                           zpop.closePop(); 
+                        }
+                        
+                    }
+                }
+            }
+        },
+        light:function (content,t) {
+            this.lightTpl(content);
+            var _t=t||2000;
+            var lightWrap=document.getElementById("zpop-light-wrap");
+            lightWrap.style.zIndex=1000;
+            var w=0,h=0;
+            var timer=setInterval(function (){
+                w +=10;
+                h +=5;
+                lightWrap.style.width =w+"px";
+                lightWrap.style.height =h+"px";
+                lightWrap.style.marginLeft=-parseInt(w/2)+"px";
+                lightWrap.style.marginTop=-parseInt(h/2)+"px";
+                if (w>=120&&h>=60) {
+                    lightWrap.style.width="120px";
+                    lightWrap.style.height="60px";
+                    clearInterval(timer);
+                    setTimeout(function () {
+                        var zpopLight=document.getElementById("light-wrap");
+                            document.body.removeChild(zpopLight)
+                    },_t)
+                }
+            },2)
         },
         closePop: function() {
             var curOpacity = 100;
@@ -86,7 +121,7 @@
                 }
             }, 5)
         },
-        zpopshow: function(zTitle, zContent, confirmFn, cancelFn) {
+        zpopshow: function(zTitle, zContent) {
             var _title = zTitle || "提示";
             var _html = '<div class="my-zpop" id=\"my-zpop\">' +
                 '    <div class="zpop-bg" id=\"zpop-bg\"></div>' +
@@ -107,7 +142,21 @@
             new_html.id = "popup-wrap";
             new_html.innerHTML = _html;
             document.body.appendChild(new_html);
-
+        },
+        lightTpl: function (lightContent) {
+            var _html=  '    <div class="my-zpop">'+
+                        '    <div class="zpop-light-wrap" id=\"zpop-light-wrap\">'+
+                        '        <div class="zpop-light-body">'+
+                        '        <div class="zpop-light-content">'+lightContent+'</div>'+
+                        '        </div>'+
+                        '    </div>'+
+                        '    </div>';
+            var new_html = document.createElement('div');
+            new_html.id = "light-wrap";
+            new_html.innerHTML = _html;
+            document.body.appendChild(new_html);
+            document.getElementById("light-wrap").style.width="100%";
+            document.getElementById("light-wrap").style.height="100%";
         }
     }
 
