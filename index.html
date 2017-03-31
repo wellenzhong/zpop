@@ -34,8 +34,10 @@
                     return true;
                 },
                 cancelFn: function() {
-                    zpop.light("您点了取消");
-                    return false;
+
+                },
+                oncls:function (res) {
+                  alert(res)
                 }
             });
         }
