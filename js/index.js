@@ -1,12 +1,36 @@
 (function(win) {
     "use strict";
     var zpop = {
+        def_zindex:999,
         _body: document.getElementsByTagName('body')[0],
+        initBase: function () {
+          var zpopWrap=document.createElement("div");
+          zpopWrap.className="my-zpop";
+          zpopWrap.id="my-zpop";
+          document.body.appendChild(zpopWrap);
+        },
+        initBg: function () {
+          var zpopbg='<div class="zpop-bg" id=\"zpop-bg\"></div>';
+          document.getElementById('my-zpop').innerHTML=zpopbg;
+        },
         confirm: function(obj) {
+            this.def_zindex +=1;
+            var myZpop=document.getElementsByClassName('my-zpop');
+            var pop_flag=false;
+            if (obj.multiple) {
+              this.initBase();
+              pop_flag=true;
+            }else if (myZpop.length<=0) {
+              this.initBase();
+              this.initBg();
+              pop_flag=true;
+            }else{
+              pop_flag=false;
+            };
             var popexist = document.getElementsByClassName('zpop-wrap');
-            if (popexist.length <= 0) {
-                this.zpopshow(obj.title, obj.content)
-                var popup = document.getElementById("zpop-wrap");
+            if (pop_flag) {
+                this.popupTpl(obj.title, obj.content)
+                var popup = document.getElementById("popup-wrap");
                 var closeBtn = document.getElementById('zpop-close-ico');
                 var yesBtn = document.getElementById('yes-btn');
                 var cancelBtn = document.getElementById('cancel-btn');
@@ -14,6 +38,7 @@
                 var curOpacity = 0;
                 popup.style.height = '0px';
                 popup.style.width = '0px';
+                popup.style.zIndex = this.def_zindex;
                 var timer = setInterval(function() {
                     var speed1 = 10;
                     var speed2 = 8;
@@ -48,7 +73,7 @@
                 return false;
             }
             closeBtn.onclick = function() {
-                zpop.closePop();
+                zpop.popHide();
             }
 
             if (cancelBtn) {
@@ -56,10 +81,10 @@
                     if(obj.cancelFn&&typeof obj.cancelFn=="function"){
                         var _res=obj.cancelFn();
                         if (!_res) {
-                            zpop.closePop();
+                            zpop.popHide();
                         }
                     }else{
-                        zpop.closePop();
+                        zpop.popHide();
                     }
                 }
             }
@@ -68,9 +93,9 @@
                     if (obj.yesFn&&typeof obj.yesFn=="function") {
                         var _res=obj.yesFn();
                         if (!_res) {
-                           zpop.closePop(); 
+                           zpop.closePop();
                         }
-                        
+
                     }
                 }
             }
@@ -99,10 +124,10 @@
                 }
             },2)
         },
-        closePop: function() {
+        popHide: function() {
             var curOpacity = 100;
             var curBgOpacity = 20;
-            var popup = document.getElementById("zpop-wrap");
+            var popup = document.getElementById("popup-wrap");
             var zpopbg = document.getElementById("zpop-bg");
             var timer = setInterval(function() {
                 if (curOpacity > 0) {
@@ -116,32 +141,29 @@
                     zpopbg.style.filter = 'alpha(opacity=' + curBgOpacity + ')';
                 }
                 if (curOpacity <= 0 && curBgOpacity <= 0) {
-                    document.body.removeChild(document.getElementById('popup-wrap'));
+                    document.body.removeChild(document.getElementById('my-zpop'));
                     clearInterval(timer);
                 }
             }, 5)
         },
-        zpopshow: function(zTitle, zContent) {
-            var _title = zTitle || "提示";
-            var _html = '<div class="my-zpop" id=\"my-zpop\">' +
-                '    <div class="zpop-bg" id=\"zpop-bg\"></div>' +
-                '    <div class="zpop-wrap" id=\"zpop-wrap\">' +
-                '        <div class="zpop-header">' +
-                '            <div class="zpop-title">' + zTitle + '</div>' +
-                '            <span class="zpop-close-ico" id=\"zpop-close-ico\">&times;</span>' +
-                '        </div>' +
-                '        <div class="zpop-body">' +
-                '            <div class="zpop-content">' +
-                '            ' + zContent + '' +
-                '            </div>' +
-                '        </div>' +
-                '        <div class="zpop-footer"><button type="button" id=\"yes-btn\">确定</button><button type="button" id=\"cancel-btn\">取消</button></div>' +
-                '    </div>' +
-                '    </div>';
+        popupTpl: function(zTitle, zContent) {
+            var _html = '    <div class="popup-wrap" id=\"popup-wrap\">' +
+                        '        <div class="zpop-header">' +
+                        '            <div class="zpop-title">' + zTitle + '</div>' +
+                        '            <span class="zpop-close-ico" id=\"zpop-close-ico\">&times;</span>' +
+                        '        </div>' +
+                        '        <div class="zpop-body">' +
+                        '            <div class="zpop-content">' +
+                        '            ' + zContent + '' +
+                        '            </div>' +
+                        '        </div>' +
+                        '        <div class="zpop-footer"><button type="button" id=\"yes-btn\">确定</button><button type="button" id=\"cancel-btn\">取消</button></div>' +
+                        '    </div>' +
+                        '    </div>';
             var new_html = document.createElement('div');
-            new_html.id = "popup-wrap";
+            new_html.id = "zpop-wrap";
             new_html.innerHTML = _html;
-            document.body.appendChild(new_html);
+            document.getElementById("my-zpop").appendChild(new_html);
         },
         lightTpl: function (lightContent) {
             var _html=  '    <div class="my-zpop">'+
@@ -149,7 +171,7 @@
                         '        <div class="zpop-light-body">'+
                         '        <div class="zpop-light-content">'+lightContent+'</div>'+
                         '        </div>'+
-                        '    </div>'+
+
                         '    </div>';
             var new_html = document.createElement('div');
             new_html.id = "light-wrap";

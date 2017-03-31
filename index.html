@@ -6,32 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>弹出窗</title>
+    <style>
+      .btn-wrap{
+        position: fixed;
+        z-index: 9999;
+
+      }
+    </style>
 </head>
 
 <body>
-    <button type="button" id="btnlight" style="position: relative;z-index: 9999">light</button>
-    <button type="button" id="btnpop" style="position: relative;z-index: 9999">popup</button>
-
+    <div class="btn-wrap">
+        <button type="button" id="btnlight" style="position: relative;z-index: 9999">light</button>
+        <button type="button" id="btnpop" style="position: relative;z-index: 9999">popup</button>
+    </div>
     <script src="./bundle.js"></script>
     <script>
-        var btnLight=document.getElementById("btnlight");
-        var btnPopup=document.getElementById("btnpop");
-        btnpop.onclick=function(){
+        var btnLight = document.getElementById("btnlight");
+        var btnPopup = document.getElementById("btnpop");
+        btnpop.onclick = function() {
             zpop.confirm({
-                title:"温馨提示",
-                content:"大家好！",
-                yesFn: function () {
+                title: "温馨提示",
+                content: "大家好！",
+                multiple:false,
+                yesFn: function() {
                     zpop.light("您点了确定");
                     return true;
                 },
-                cancelFn: function () {
+                cancelFn: function() {
                     zpop.light("您点了取消");
                     return false;
                 }
             });
         }
-        btnLight.onclick=function () {
-            zpop.light("您点了确定",1000);
+        btnLight.onclick = function() {
+            zpop.light("您点了确定", 1000);
         }
     </script>
 </body>
