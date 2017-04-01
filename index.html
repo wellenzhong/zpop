@@ -26,17 +26,16 @@
         btnpop.onclick = function() {
             zpop.confirm({
                 title: "温馨提示",
-                content: "大家好！",
-                multiple: false,
-                yesFn: function() {
+                content: "大家好",
+                multiple: true,
+                yesFn: function(res) {
                     zpop.light("您点了确定");
                     return true;
                 },
-                cancelFn: function() {
+                cancelFn: function(res) {
 
                 },
                 oncls:function (res) {
-                  alert(res)
                 }
             });
         }

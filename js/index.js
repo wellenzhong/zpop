@@ -2,32 +2,41 @@
     "use strict";
     var zpop = {
         def_zindex:999,
+        returnVal:"",
+        rIds:[],
         _body: document.getElementsByTagName('body')[0],
-        initBase: function () {
+        initBase: function (rId) {
           var zpopWrap=document.createElement("div");
           zpopWrap.className="my-zpop";
-          zpopWrap.id="my-zpop";
+          zpopWrap.id="my-zpop"+rId;
           document.body.appendChild(zpopWrap);
-          console.log(this.def_zindex);
           this.def_zindex +=1;
         },
-        initBg: function () {
-          var zpopbg='<div class="zpop-bg" id=\"zpop-bg\"></div>';
-          document.getElementById('my-zpop').innerHTML=zpopbg;
+        initBg: function (rId) {
+          var zpopBgHtml='<div class="zpop-bg" id=\"zpop-bg\"></div>';
+          var zpopBgHtml=document.createElement("div");
+          zpopBgHtml.id="zpop-bg";
+          zpopBgHtml.className="zpop-bg";
+          var zpopBg=document.getElementById('zpop-bg');
+          if (zpopBg<=0) {
+            document.body.appendChild(zpopBgHtml);
+          }else {
+            return;
+          }
         },
-        initBtn:  function (obj,rId) {
-          var btns='<button type="button" id=\"yes-btn\">确定</button><button type="button" id=\"cancel-btn\">取消</button>';
+        initBtn:  function (obj,rId,returnVal) {
+          var btns='<button type="button" id=\"yes-btn'+rId+'\">确定</button><button type="button" id=\"cancel-btn'+rId+'\">取消</button>';
           var foot=document.getElementById(rId).getElementsByClassName("zpop-footer")[0];
           foot.innerHTML=btns;
-          var yesBtn = document.getElementById('yes-btn');
-          var cancelBtn = document.getElementById('cancel-btn');
+          var yesBtn = document.getElementById('yes-btn'+rId);
+          var cancelBtn = document.getElementById('cancel-btn'+rId);
           if (cancelBtn) {
               cancelBtn.onclick=function(){
                   if(obj.cancelFn&&typeof obj.cancelFn=="function"){
                       var _res=obj.cancelFn();
                       if (!_res) {
                           zpop.popHide(rId);
-                          obj.oncls("把这个值带回去！")
+                          obj.oncls()
                       }
                   }else{
                       zpop.popHide(rId);
@@ -46,25 +55,64 @@
               }
           }
         },
+        ready:function (rId) {
+          var that=this;
+          var popHeader=document.getElementsByClassName('zpop-header');
+          var popHeadLen=popHeader.length;
+          if (popHeader.length>0) {
+            var cur_left=[],cur_top=[],oldX=[],oldY=[],newX=[],newY=[],offsetX=[],offsetY=[],_wrap=[];
+            this.rIds.push(rId);
+            console.log(this);
+            for (var i = 0; i < popHeadLen; i++) {
+              (function (i) {
+                popHeader[i].onmousedown=function (ev) {
+                  _wrap[i]=document.getElementById(zpop.rIds[i]);
+                  cur_left[i]=window.getComputedStyle? window.getComputedStyle(_wrap[i], null).left:_wrap[i].currentStyle.left;//760
+                  cur_top[i]=window.getComputedStyle? window.getComputedStyle(_wrap[i], null).top:_wrap[i].currentStyle.top;
+                  oldX[i]=ev.clientX;
+                  oldY[i]=ev.clientY;
+                  this.onmousemove=function (e) {
+                    newX[i]=e.clientX;
+                    newY[i]=e.clientY;
+                    offsetX[i]=newX[i]-oldX[i];
+                    offsetY[i]=newY[i]-oldY[i];
+                    this.style.cursor="default";
+                    console.log(cur_left[i])
+                    _wrap[i].style.left=parseInt(cur_left[i])+parseInt(offsetX[i])+"px";
+                    _wrap[i].style.top=parseInt(cur_top[i])+parseInt(offsetY[i])+"px";
+                  }
+                };
+                popHeader[i].onmouseup=function () {
+                  this.onmousemove=null;
+                };
+                popHeader[i].onmouseout=function (e) {
+                  this.onmousemove=null;
+                }
+              })(i)
+            }
+          }
+        },
         confirm: function(obj) {
             var randId=parseInt(Math.random()*1000);
             var myZpop=document.getElementsByClassName('my-zpop');
             var popexist = document.getElementsByClassName('zpop-wrap');
             var pop_flag=false;
             if (obj.multiple) {
-              this.initBase();
+              this.initBase(randId);
+              this.initBg(randId);
               pop_flag=true;
             }else if (popexist.length<=0&&myZpop.length<=0) {
-              this.initBase();
-              this.initBg();
+              this.initBase(randId);
+              this.initBg(randId);
               pop_flag=true;
             }else{
               pop_flag=false;
             };
             if (pop_flag) {
-                this.popupTpl(obj.title, obj.content,randId)
+                this.popupTpl(obj.title, obj.content,randId);
+                this.ready(randId);
                 var popup = document.getElementById(randId);
-                var closeBtn = document.getElementById('zpop-close-ico');
+                var closeBtn = document.getElementById('zpop-close-ico'+randId);
                 popup.style.display = "block";
                 var curOpacity = 0;
                 popup.style.height = '0px';
@@ -107,9 +155,10 @@
             }
         },
         light:function (content,t) {
-            this.lightTpl(content);
+            var lightId=parseInt(Math.random()*1000);
+            this.lightTpl(content,lightId);
             var _t=t||2000;
-            var lightWrap=document.getElementById("zpop-light-wrap");
+            var lightWrap=document.getElementById("zpop-light-wrap"+lightId);
             lightWrap.style.zIndex=this.def_zindex+1;
             var w=0,h=0;
             var timer=setInterval(function (){
@@ -123,18 +172,20 @@
                     lightWrap.style.width="120px";
                     lightWrap.style.height="60px";
                     clearInterval(timer);
-                    // setTimeout(function () {
-                    //     var zpopLight=document.getElementById("light-wrap");
-                    //         document.body.removeChild(zpopLight)
-                    // },_t)
+                    setTimeout(function () {
+                        var zpopLight=document.getElementById("my-light"+lightId);
+                        document.body.removeChild(zpopLight)
+                    },_t)
                 }
             },2)
         },
-        popHide: function(m) {
+        popHide: function(rId) {
             var curOpacity = 100;
             var curBgOpacity = 20;
-            var popup = document.getElementById(m);
+            var popup = document.getElementById(rId);
             var zpopbg = document.getElementById("zpop-bg");
+            var popexist = document.getElementsByClassName('zpop-wrap');
+            var popLen=popexist.length;
             var curWidth = popup.currentStyle ? popup.currentStyle.width : window.getComputedStyle(popup, null).width;
             var curHeight = popup.currentStyle ? popup.currentStyle.height : window.getComputedStyle(popup, null).height;
             curWidth = parseInt(curWidth);
@@ -151,22 +202,37 @@
                     popup.style.marginTop = (0 - curHeight / 2) + "px";
                     popup.style.filter = 'alpha(opacity=' + curOpacity + ')';
                 }
-                if (curBgOpacity > 0) {
+                if (curBgOpacity > 0&&popLen==1) { //判断是否多个弹窗，如果是的话，先不隐藏背景层；
                     curBgOpacity -= 1;
                     zpopbg.style.opacity = curBgOpacity / 100;
                     zpopbg.style.filter = 'alpha(opacity=' + curBgOpacity + ')';
                 }
-                if ((curOpacity <= 0 && curBgOpacity <= 0)||curWidth<=0||curHeight<=0) {
-                    document.body.removeChild(document.getElementById('my-zpop'));
+                if (curOpacity <= 0||curWidth<=0||curHeight<=0) {
+                    /*if (popLen==1) {
+                      clearInterval(timer);
+                      document.body.removeChild(zpopbg);
+                    }else if(curBgOpacity<=0){
+                      clearInterval(timer);
+                    }*/
                     clearInterval(timer);
+                    document.body.removeChild(document.getElementById('my-zpop'+rId));
+                    var _idx=zpop.rIds.indexOf(rId);
+                    zpop.rIds.splice(_idx,1);
+                    if (popLen==1) {
+                      document.body.removeChild(zpopbg);
+                    }
+                }
+                if (curBgOpacity<=0) {
+                  document.body.removeChild(zpopbg);
                 }
             }, 5)
         },
         popupTpl: function(zTitle, zContent,rId) {
+
             var _html = '    <div class="popup-wrap" id='+rId+'>' +
                         '        <div class="zpop-header">' +
                         '            <div class="zpop-title">' + zTitle + '</div>' +
-                        '            <span class="zpop-close-ico" id=\"zpop-close-ico\">&times;</span>' +
+                        '            <span class="zpop-close-ico" id=\"zpop-close-ico'+rId+'\">&times;</span>' +
                         '        </div>' +
                         '        <div class="zpop-body">' +
                         '            <div class="zpop-content">' +
@@ -177,22 +243,21 @@
                         '    </div>' +
                         '    </div>';
             var new_html = document.createElement('div');
-            new_html.id = "zpop-wrap";
+            new_html.id = "zpop-wrap"+rId;
+            new_html.className = "zpop-wrap";
             new_html.innerHTML = _html;
-            document.getElementById("my-zpop").appendChild(new_html);
+            document.getElementById("my-zpop"+rId).appendChild(new_html);
         },
-        lightTpl: function (lightContent) {
-            var _html=  '    <div class="zpop-light-wrap" id=\"zpop-light-wrap\">'+
+        lightTpl: function (lightContent,rId) {
+            var _html=  '    <div class="zpop-light-wrap" id=\"zpop-light-wrap'+rId+'\">'+
                         '        <div class="zpop-light-body">'+
                         '        <div class="zpop-light-content">'+lightContent+'</div>'+
                         '    </div>';
             var new_html = document.createElement('div');
-            new_html.id = "my-light";
+            new_html.id = "my-light"+rId;
             new_html.className = "my-light";
             new_html.innerHTML = _html;
             document.body.appendChild(new_html);
-            document.getElementById("my-light").style.width="100%";
-            document.getElementById("my-light").style.height="100%";
         }
     }
 
