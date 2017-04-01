@@ -7,11 +7,10 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>弹出窗</title>
     <style>
-      .btn-wrap{
-        position: fixed;
-        z-index: 9999;
-
-      }
+        .btn-wrap {
+            position: fixed;
+            z-index: 9999;
+        }
     </style>
 </head>
 
@@ -28,7 +27,7 @@
             zpop.confirm({
                 title: "温馨提示",
                 content: "大家好！",
-                multiple:false,
+                multiple: false,
                 yesFn: function() {
                     zpop.light("您点了确定");
                     return true;
